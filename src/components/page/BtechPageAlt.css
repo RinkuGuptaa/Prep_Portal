@@ -1,0 +1,400 @@
+/* BtechPageAlt.css */
+
+/* Global dark mode class for body (if you choose to apply it there) */
+body.dark-mode-global {
+  background-color: #222; /* Darker background for the whole page */
+  color: #f0f0f0;
+}
+
+.btech-page-container {
+  font-family: 'Arial', sans-serif;
+  background-color: white;
+  color: black;
+  transition: background-color 0.3s, color 0.3s;
+  padding-top: 60px; /* Adjust based on navbar height if navbar is fixed/sticky and content scrolls under it */
+  min-height: 100vh;
+}
+
+.btech-page-container.dark-mode-component {
+  background-color: #333; /* Component-specific dark background */
+  color: white;
+}
+
+.navbar-custom {
+  background-color: rgb(0, 0, 0);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem; /* Adjusted padding */
+  position: fixed; /* Making navbar fixed */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030; /* Bootstrap's default fixed navbar z-index */
+  width: 100%;
+  height: 60px; /* Example fixed height */
+}
+/*
+.btech-page-container.dark-mode-component .navbar-custom {
+    /* No change needed if already black, but could specify if needed 
+}*/
+
+
+.logo-custom {
+  font-size: 1.75rem; /* Adjusted size */
+  font-family: 'Lobster', cursive; /* Ensure Lobster font is imported in your main CSS or index.html */
+  margin-bottom: 0; /* Override Bootstrap defaults if any */
+}
+
+.color-text-custom {
+  color: rgb(60, 133, 194); /* Tailwind's text-blue-400 approx */
+}
+
+.nav-link-custom { /* Target <a> and <Link> in navbar */
+  color: white !important; /* Important to override potential Link component styles */
+  transition: color 0.3s, background-color 0.3s;
+  text-decoration: none !important;
+  padding: 8px 15px; /* Adjusted padding */
+  margin: 0 5px; 
+  border-radius: 8px;
+}
+
+.nav-link-custom:hover {
+  color: #ffdd57 !important; /* Tailwind's text-yellow-300 approx */
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-toggler-custom {
+  border: none;
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  border-radius: 5px;
+  padding: 0.4rem 0.6rem; /* Adjusted padding */
+}
+.navbar-toggler-custom:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.sidebar-custom {
+  position: fixed;
+  top: 0; /* Align with top of viewport */
+  left: -280px; /* Slightly wider */
+  width: 280px;
+  height: 100%;
+  background-color: #282c34; /* Darker sidebar */
+  color: white;
+  transition: left 0.3s ease-in-out;
+  z-index: 1040; /* Higher than navbar */
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  padding-top: 70px; /* To clear fixed navbar */
+  overflow-y: auto;
+  border-right: 2px solid rgb(60, 133, 194);
+}
+.btech-page-container.dark-mode-component .sidebar-custom,
+.sidebar-custom.dark-mode-sidebar { /* For component-level dark mode */
+  background-color: #1e1e1e; /* Even darker for dark mode */
+  border-right: 2px solid #ffdd57;
+}
+
+
+.sidebar-custom.open {
+  left: 0;
+}
+
+.sidebar-title-custom {
+  margin-bottom: 25px;
+  font-size: 1.6rem;
+  color: rgb(60, 133, 194);
+  text-align: center;
+}
+.btech-page-container.dark-mode-component .sidebar-title-custom,
+.sidebar-custom.dark-mode-sidebar .sidebar-title-custom {
+    color: #ffdd57;
+}
+
+
+.sidebar-link-custom { /* Target <a> and <Link> in sidebar */
+  color: white !important;
+  padding: 12px 15px;
+  display: block;
+  text-decoration: none !important;
+  border-radius: 5px;
+  transition: background-color 0.3s, color 0.3s;
+  margin: 10px 0;
+  font-size: 1rem;
+}
+
+.sidebar-link-custom:hover {
+  background-color: rgb(60, 133, 194);
+  color: white !important;
+}
+.btech-page-container.dark-mode-component .sidebar-link-custom:hover,
+.sidebar-custom.dark-mode-sidebar .sidebar-link-custom:hover {
+  background-color: #ffdd57;
+  color: black !important;
+}
+
+.btn-circle-custom {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background-color 0.3s, color 0.3s;
+  background-color: #555; /* Darker gray */
+  color: white;
+  border: none;
+  font-size: 1.2rem; /* For emoji icon */
+}
+
+.btn-circle-custom:hover {
+  background-color: rgb(60, 133, 194);
+}
+.btech-page-container.dark-mode-component .btn-circle-custom,
+.sidebar-custom.dark-mode-sidebar .btn-circle-custom {
+    background-color: #444;
+}
+.btech-page-container.dark-mode-component .btn-circle-custom:hover,
+.sidebar-custom.dark-mode-sidebar .btn-circle-custom:hover {
+    background-color: #ffdd57;
+    color: black;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 1035; /* Below sidebar, above content */
+  display: none; /* Initially hidden */
+}
+.sidebar-custom.open + .sidebar-overlay { /* Show overlay when sidebar is open */
+    display: block;
+}
+
+
+.main-content-custom {
+  padding: 20px 15px; /* Add some padding */
+  transition: margin-left 0.3s ease-in-out; /* For sidebar push effect if used */
+  /* margin-top: 60px; /* Height of the fixed navbar */ /* Already handled by btech-page-container padding-top */
+}
+/* Example of push effect if sidebar doesn't overlay: */
+/* .main-content-custom.sidebar-open-push-effect {
+  margin-left: 280px;
+} */
+
+
+.heading-custom {
+  font-size: 1.8rem; /* Adjusted size */
+  font-weight: bold;
+  margin-bottom: 30px; /* More space */
+}
+
+.custom-card-react {
+  background-color: #e9ecef; /* Light grey, Bootstrap's bg-light approx */
+  border: 2px solid #dee2e6; /* Bootstrap's border-light approx */
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 180px; /* Or 170px as in original */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease-in-out, border-color 0.3s, background-color 0.3s;
+}
+
+.custom-card-react:hover {
+  transform: translateY(-5px) scale(1.03); /* More subtle hover */
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btech-page-container.dark-mode-component .custom-card-react,
+.custom-card-react.dark-mode-card {
+  background-color: #3a3f44; /* Darker card background */
+  border-color: #555e67;
+}
+
+.card-title-custom {
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.15rem; /* Adjusted size */
+  margin-bottom: 1rem;
+}
+.btech-page-container.dark-mode-component .card-title-custom {
+    color: #f0f0f0; /* Lighter text for dark card */
+}
+
+
+.custom-card-react .card-body {
+  padding: 1.25rem; /* Standard Bootstrap card padding */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
+}
+
+/* Ensure Bootstrap JS for toggler/collapse isn't fighting React state for sidebar */
+/* It's generally safer to handle all dynamic UI with React state */
+
+/* Responsive adjustments for main content if sidebar pushes */
+/* @media (min-width: 992px) { // lg breakpoint
+  .main-content-custom.sidebar-open-push-effect {
+    margin-left: 280px;
+  }
+} */
+
+
+/* Services Section Styles */
+.services-section {
+  background-color: #f8f9fc;
+  position: relative;
+  overflow: hidden;
+}
+
+.dark-services {
+  background-color: #2c3e50;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  position: relative;
+  display: inline-block;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #4e73df, #1cc88a);
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.dark-services .section-title::after {
+  background: linear-gradient(90deg, #f6c23e, #e74a3b);
+}
+
+.section-subtitle {
+  font-size: 1.1rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.service-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.dark-service-card {
+  background: #34495e;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.service-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(to bottom, #4e73df, #1cc88a);
+  transition: all 0.3s ease;
+}
+
+.dark-service-card::before {
+  background: linear-gradient(to bottom, #f6c23e, #e74a3b);
+}
+
+.service-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.dark-service-card:hover {
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.service-icon {
+  transition: all 0.3s ease;
+}
+
+.service-card:hover .service-icon {
+  transform: scale(1.1);
+}
+
+.service-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.service-title::after {
+  content: '';
+  position: absolute;
+  width: 40px;
+  height: 2px;
+  background: #4e73df;
+  bottom: 0;
+  left: 0;
+}
+
+.dark-service-card .service-title::after {
+  background: #f6c23e;
+}
+
+.service-description {
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.service-features {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.service-features li {
+  position: relative;
+  padding-left: 25px;
+  margin-bottom: 0.5rem;
+}
+
+.service-features li::before {
+  content: '\f00c';
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  position: absolute;
+  left: 0;
+  color: #4e73df;
+}
+
+.dark-service-card .service-features li::before {
+  color: #f6c23e;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 2rem;
+  }
+  
+  .service-card {
+    margin-bottom: 20px;
+  }
+}
