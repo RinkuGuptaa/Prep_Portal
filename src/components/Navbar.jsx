@@ -1,10 +1,17 @@
-import React from 'react';
-import { Link, useNavigate  } from 'react-router-dom';
-import { toast } from 'react-toastify'; 
+import React, { useState, useRef, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
 const Navbar = () => {
   const navigate = useNavigate();
+  const [isNavCollapsed, setIsNavCollapsed] = useState(true);
+  const navbarRef = useRef(null);
 
- const handleEducationClick = (e) => {
+  const handleNavToggle = () => {
+    setIsNavCollapsed(!isNavCollapsed);
+  };
+
+  const handleEducationClick = (e) => {
     const user = localStorage.getItem('user');
     if (!user) {
       e.preventDefault();
@@ -12,10 +19,8 @@ const Navbar = () => {
         position: "top-center",
         autoClose: 3000,
       });
-      // Open the login/signup modal
       const modal = document.getElementById('authModal');
       if (modal) {
-        // Bootstrap modal show
         window.$('#authModal').modal('show');
       }
     } else {
@@ -24,46 +29,69 @@ const Navbar = () => {
         autoClose: 1500,
       });
     }
-    // else allow navigation
   };
 
+  // Close navbar when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (navbarRef.current && !navbarRef.current.contains(event.target)) {
+        setIsNavCollapsed(true);
+      }
+    };
+
+    // Add when the menu is open
+    if (!isNavCollapsed) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isNavCollapsed]);
+
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark">
+    <nav 
+      className="navbar navbar-expand-lg navbar-dark"
+      ref={navbarRef}
+    >
       <Link className="navbar-brand" to="/">
         <img src="/assets/Logo1.png" alt="Books and Particles Logo" style={{ width: '50px' }} />
       </Link>
       <button
         className="navbar-toggler"
         type="button"
-        data-toggle="collapse"
-        data-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
+        onClick={handleNavToggle}
+        aria-expanded={!isNavCollapsed}
       >
         <span className="navbar-toggler-icon"></span>
       </button>
-      <div className="collapse navbar-collapse" id="navbarNav">
+      <div 
+        className={`collapse navbar-collapse ${!isNavCollapsed ? 'show' : ''}`}
+        id="navbarNav"
+      >
         <ul className="navbar-nav ml-auto">
           <li className="nav-item">
-            <Link className="nav-link" to="/">Home</Link>
+            <Link className="nav-link" to="/" onClick={() => setIsNavCollapsed(true)}>Home</Link>
           </li>
           <li className="nav-item">
-            <Link className="nav-link" to="/overview">Overview</Link>
+            <Link className="nav-link" to="/overview" onClick={() => setIsNavCollapsed(true)}>Overview</Link>
           </li>
           <li className="nav-item">
-            <Link className="nav-link" to="/team">Team</Link>
+            <Link className="nav-link" to="/team" onClick={() => setIsNavCollapsed(true)}>Team</Link>
           </li>
           <li className="nav-item">
-            <Link className="nav-link" to="/enterprise">Enterprise</Link>
+            <Link className="nav-link" to="/enterprise" onClick={() => setIsNavCollapsed(true)}>Enterprise</Link>
           </li>
           <li className="nav-item">
-            <Link className="nav-link" to="/btech" onClick={handleEducationClick} >
+            <Link className="nav-link" to="/btech" onClick={(e) => {
+              handleEducationClick(e);
+              setIsNavCollapsed(true);
+            }}>
               Education
             </Link>
           </li>
           <li className="nav-item">
-            <Link className="nav-link" to="/contact">Contact</Link>
+            <Link className="nav-link" to="/contact" onClick={() => setIsNavCollapsed(true)}>Contact</Link>
           </li>
           <li className="nav-item">
             <button
@@ -71,6 +99,7 @@ const Navbar = () => {
               data-toggle="modal"
               data-target="#authModal"
               style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+              onClick={() => setIsNavCollapsed(true)}
             >
               Log In
             </button>

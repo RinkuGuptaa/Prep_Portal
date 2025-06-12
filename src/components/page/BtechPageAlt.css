@@ -239,17 +239,6 @@ body.dark-mode-global {
   flex-grow: 1;
 }
 
-/* Ensure Bootstrap JS for toggler/collapse isn't fighting React state for sidebar */
-/* It's generally safer to handle all dynamic UI with React state */
-
-/* Responsive adjustments for main content if sidebar pushes */
-/* @media (min-width: 992px) { // lg breakpoint
-  .main-content-custom.sidebar-open-push-effect {
-    margin-left: 280px;
-  }
-} */
-
-
 /* Services Section Styles */
 .services-section {
   background-color: #f8f9fc;
