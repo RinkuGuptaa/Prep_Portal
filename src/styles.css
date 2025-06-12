@@ -74,7 +74,7 @@ html, body {
 }
 
 .btn-link {
-    color: rgb(84, 228, 12) !important;
+    color: #ffdd57 !important;
     background: none;
     border: none;
     cursor: pointer;
