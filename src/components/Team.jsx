@@ -14,14 +14,14 @@ const Team = () => {
       id: 1,
       name: "Rinku Kumar Gupta",
       image: "/assets/RINKU PIC.jpg",
-      github: "https://github.com/RinkuGuptaa",
+      github: "http://www.linkedin.com/in/rinku-gupta-384b07283",
       delay: 0.1
     },
     {
       id: 2,
       name: "Tania Samanddar",
       image: "/assets/Tania.jpg",
-      github: "https://github.com/tania12-cloud",
+      github: "http://www.linkedin.com/in/tania-samaddar-280a08284",
       delay: 0.2
     },
     {
