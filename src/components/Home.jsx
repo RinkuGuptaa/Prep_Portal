@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import Typed from 'typed.js';
 import { useNavigate } from 'react-router-dom';
-import './Home.css'; // We'll create this CSS file
+import { toast } from 'react-toastify';
+import './Home.css';
 
 const Home = () => {
   const [containerRef, inView] = useInView({
@@ -11,8 +12,7 @@ const Home = () => {
     threshold: 0.2
   });
 
-   const navigate = useNavigate(); 
-
+  const navigate = useNavigate(); 
   const typedElementRef = useRef(null);
   const typedInstanceRef = useRef(null);
   const animationFrameRef = useRef(null);
@@ -35,6 +35,23 @@ const Home = () => {
     "https://media.gcflearnfree.org/content/55e0730c7dd48174331f5164_01_17_2014/whatisacomputer_laptop_computers.jpg",
     "https://burst.shopifycdn.com/photos/laptop-from-above.jpg?width=1000&format=pjpg&exif=0&iptc=0"
   ];
+
+  const handleExploreClick = () => {
+    const user = localStorage.getItem('user');
+    if (!user) {
+      toast.error('Please log in to access resources', {
+        position: "top-center",
+        autoClose: 3000,
+      });
+      // Show the auth modal (assuming you're using Bootstrap)
+      const modal = document.getElementById('authModal');
+      if (modal) {
+        window.$('#authModal').modal('show');
+      }
+    } else {
+      navigate('/btech');
+    }
+  };
 
   useEffect(() => {
     if (inView && typedElementRef.current) {
@@ -180,16 +197,15 @@ const Home = () => {
             animate={inView ? { opacity: 1 } : {}}
             transition={{ delay: 0.6, duration: 0.5 }}
           >
-
-            
-            <button className="cta-button"
-              onClick={() => navigate('/btech')}>
+            <button 
+              className="cta-button"
+              onClick={handleExploreClick}
+            >
               Explore Resources
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12h14M12 5l7 7-7 7"></path>
               </svg>
             </button>
-            
           </motion.div>
         </motion.div>
       </div>

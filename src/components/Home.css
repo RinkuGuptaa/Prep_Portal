@@ -106,32 +106,31 @@
 .book {
   position: absolute;
   width: 100px;
-  height: auto;
+  height: 120px;
   z-index: 1;
   opacity: 1;
-  pointer-events: none;
 }
 
 .book img {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
   border-radius: 3px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .particle {
   position: absolute;
   width: 8px;
   height: 8px;
+  background: rgba(52, 152, 219, 0.7);
   border-radius: 50%;
-  background-color: rgba(99, 102, 241, 0.6);
   z-index: 1;
-  pointer-events: none;
 }
 
 @media (max-width: 768px) {
   .main-title {
-    font-size: 2.5rem;
+    font-size: 2rem;
   }
   
   .subtitle {
@@ -139,11 +138,6 @@
   }
   
   .typed-text {
-    font-size: 1.4rem;
-  }
-  
-  .stats-container {
-    flex-direction: column;
-    gap: 1rem;
+    font-size: 1rem;
   }
 }

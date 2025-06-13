@@ -13,12 +13,12 @@ const Overview = () => {
   const [direction, setDirection] = useState(1); // 1 for forward, -1 for backward
 
   const slides = [
-    { id: 1, image: "/assets/Screenshot (167).png" },
-    { id: 2, image: "/assets/Screenshot (168).png" },
-    { id: 3, image: "/assets/Screenshot (169).png" },
-    { id: 4, image: "/assets/Screenshot (170).png" },
-    { id: 5, image: "/assets/Screenshot (171).png" },
-    { id: 6, image: "/assets/Screenshot (172).png" }
+    { id: 1, image: "/assets/S1.png" },
+    { id: 2, image: "/assets/S2.png" },
+    { id: 3, image: "/assets/S3.png" },
+    { id: 4, image: "/assets/S4.png" },
+    { id: 5, image: "/assets/S5.png" },
+    { id: 6, image: "/assets/S6.png" }
   ];
 
   // Auto-advance slides every 5 seconds

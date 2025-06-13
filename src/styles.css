@@ -688,6 +688,7 @@ footer {
     margin: 0 auto;
     padding: 2rem;
     color: #333;
+    padding-top: 80px; /* Added to ensure content starts below navbar */
 }
 
 .contact-hero {
