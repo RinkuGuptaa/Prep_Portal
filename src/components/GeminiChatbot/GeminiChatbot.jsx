@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './GeminiChatbot.css'; // Import the CSS
 
 const GeminiChatbot = () => {
-    // ... (all your existing state and useEffect hooks remain the same) ...
     const [theme, setTheme] = useState('dark');
     const [isSidebarActive, setIsSidebarActive] = useState(false);
     const [saveToHistory, setSaveToHistory] = useState(() => {
@@ -63,34 +62,31 @@ const GeminiChatbot = () => {
     useEffect(() => {
         const storedHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
         setChatHistoryData(storedHistory);
-        if (storedHistory.length === 0) { // If no history, start fresh
+        if (storedHistory.length === 0) {
             setCurrentChatId(Date.now());
             setShowWelcome(true);
             setCurrentMessages([]);
         }
-    }, []); // Load once on mount
+    }, []);
 
     useEffect(() => {
-        // Only save if there's data or if it was explicitly cleared
         if (chatHistoryData.length > 0 || localStorage.getItem('chatHistory') !== null) {
             localStorage.setItem('chatHistory', JSON.stringify(chatHistoryData));
         }
     }, [chatHistoryData]);
 
-
     // --- FORMATTING FUNCTIONS ---
     const escapeHtml = (unsafe) => {
-        if (typeof unsafe !== 'string') return ''; // Handle non-string inputs gracefully
+        if (typeof unsafe !== 'string') return '';
         return unsafe
-            .replace(/&/g, "&") // Must be first
+            .replace(/&/g, "&")
             .replace(/</g, "<")
             .replace(/>/g, ">")
-            
             .replace(/'/g, "'");
     };
-    
+
     const processInlineFormatting = (text) => {
-        let escapedText = escapeHtml(String(text || '')); // Ensure text is a string
+        let escapedText = escapeHtml(String(text || ''));
         return escapedText
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
             .replace(/\*(.*?)\*/g, '<em>$1</em>')
@@ -98,33 +94,29 @@ const GeminiChatbot = () => {
             .replace(/`([^`]+)`/g, '<code>$1</code>')
             .replace(/\n/g, '<br />');
     };
-    
+
     const formatBotContent = (content) => {
-        content = String(content || ''); // Ensure content is a string
+        content = String(content || '');
         let paragraphsHtml = [];
         let tempContent = content;
 
-        // Regex to find code blocks first to preserve them
         const codeBlockRegex = /```([a-z]*\n)?([\s\S]*?)```/g;
         let lastIndex = 0;
         let match;
 
         while ((match = codeBlockRegex.exec(tempContent)) !== null) {
-            // Process text before the code block
             const beforeCode = tempContent.substring(lastIndex, match.index);
             if (beforeCode.trim()) {
-                 paragraphsHtml.push(...beforeCode.split('\n\n').filter(p => p.trim()).map(p => `<p>${processInlineFormatting(p)}</p>`));
+                paragraphsHtml.push(...beforeCode.split('\n\n').filter(p => p.trim()).map(p => `<p>${processInlineFormatting(p)}</p>`));
             }
 
-            // Process the code block
             const lang = match[1] ? match[1].trim() : '';
             const codeContent = match[2].trim();
             const escapedCodeContent = escapeHtml(codeContent);
             paragraphsHtml.push(`<pre><code class="language-${lang}">${escapedCodeContent}</code></pre>`);
             lastIndex = codeBlockRegex.lastIndex;
         }
-        
-        // Process text after the last code block
+
         const afterLastCodeBlock = tempContent.substring(lastIndex);
         if (afterLastCodeBlock.trim()) {
             paragraphsHtml.push(...afterLastCodeBlock.split('\n\n').filter(p => p.trim()).map(p => {
@@ -134,7 +126,7 @@ const GeminiChatbot = () => {
                     const headingText = processedPara.replace(/^#+\s/, '');
                     return `<h${level}>${processInlineFormatting(headingText)}</h${level}>`;
                 }
-                 if (processedPara.startsWith('> ')) {
+                if (processedPara.startsWith('> ')) {
                     const quoteText = processedPara.substring(2);
                     return `<blockquote>${processInlineFormatting(quoteText)}</blockquote>`;
                 }
@@ -167,77 +159,76 @@ const GeminiChatbot = () => {
             let chat = historyCopy.find(c => c.id === chatIdToSaveTo);
             if (!chat) {
                 chat = { id: chatIdToSaveTo, title: null, messages: [] };
-                historyCopy.unshift(chat); 
+                historyCopy.unshift(chat);
             }
             chat.messages.push({ message: messageContent, sender: senderRole, timestamp: Date.now() });
-            // Update title based on the first user message if not already set
             if (!chat.title) {
                 const firstUserMsg = chat.messages.find(m => m.sender === 'user');
                 if (firstUserMsg) {
                     chat.title = firstUserMsg.message.substring(0, 30) + (firstUserMsg.message.length > 30 ? "..." : "");
-                } else if (chat.messages.length > 0) { // Fallback if first message isn't user (e.g. initial bot message)
-                     chat.title = chat.messages[0].message.substring(0, 30) + (chat.messages[0].message.length > 30 ? "..." : "");
+                } else if (chat.messages.length > 0) {
+                    chat.title = chat.messages[0].message.substring(0, 30) + (chat.messages[0].message.length > 30 ? "..." : "");
                 }
             }
             return historyCopy;
         });
-    }, [saveToHistory]); 
-    
+    }, [saveToHistory]);
+
+    const detectInputLanguage = (text) => {
+        if (/[\u0900-\u097F]/.test(text)) return 'hi'; // Hindi
+        if (/[\uAC00-\uD7AF]/.test(text)) return 'ko'; // Korean
+        if (/[\u0400-\u04FF]/.test(text)) return 'ru'; // Russian
+        if (/[\u0600-\u06FF]/.test(text)) return 'ar'; // Arabic
+        if (/[\u0E00-\u0E7F]/.test(text)) return 'th'; // Thai
+        if (/[\u0980-\u09FF]/.test(text)) return 'bn'; // Bengali
+        
+        // Default to English if no specific script detected
+        return 'en';
+    };
 
     const handleSendMessage = async () => {
         const messageText = userInput.trim();
         if (!messageText || isTyping) return;
 
+        // Detect language from input
+        const userLanguage = detectInputLanguage(messageText);
+
         let interactionChatId = currentChatId;
-        // If it's a brand new chat (welcome message is showing), assign a new ID for this interaction
-        if (showWelcome) { 
-            interactionChatId = Date.now(); 
-            setCurrentChatId(interactionChatId); // Set this as the active chat
+        if (showWelcome) {
+            interactionChatId = Date.now();
+            setCurrentChatId(interactionChatId);
         }
-        
+
         addMessageToDisplay(messageText, 'user');
-        // Save user message to history storage for the current/new interactionChatId
         if (saveToHistory) {
             saveMessageToHistoryStorage(messageText, 'user', interactionChatId);
         }
-        
+
         setUserInput('');
         if (userInputRef.current) userInputRef.current.style.height = 'auto';
         setIsTyping(true);
 
         try {
-            // Find the chat to send to API, ensuring it includes the message just added
             const chatForApi = 
-                chatHistoryData.find(c => c.id === interactionChatId) || // Existing chat
-                { id: interactionChatId, messages: [{message: messageText, sender: 'user', timestamp: Date.now()}] }; // New chat case
+                chatHistoryData.find(c => c.id === interactionChatId) || 
+                { id: interactionChatId, messages: [{ message: messageText, sender: 'user', timestamp: Date.now() }] };
 
-
-            // Construct history for API call, excluding the very last user message if it's identical to messageText
-            // to prevent sending it twice if saveMessageToHistoryStorage updated chatHistoryData immediately.
             const historyForApiCall = chatForApi.messages
                 .filter((msg, index, arr) => !(msg.sender === 'user' && msg.message === messageText && index === arr.length - 1))
-                .map(msg => ({ 
-                    role: msg.sender, // Send 'user' or 'bot' as role
+                .map(msg => ({
+                    role: msg.sender,
                     message: msg.message
                 }));
-            
-            // Append the current user's message if it wasn't part of the stored history yet
-            // This ensures the current question is always part of the context for the API
-            if (!historyForApiCall.find(h => h.role === 'user' && h.message === messageText)) {
-                // This logic might be redundant if saveMessageToHistoryStorage runs synchronously
-                // and chatForApi already includes the latest user message. Test this part.
-            }
 
-            // --- FETCH URL ---
-            // const backendUrl = 'http://localhost:8080/api/ask'; // For local dev if backend on 8080
-            const backendUrl = '/api/ask'; // For production or if proxy is set up
+            const backendUrl = 'https://prep-portal-backend.onrender.com/api/ask';
 
             const response = await fetch(backendUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     question: messageText,
-                    chatHistory: historyForApiCall // Send history with {role, message}
+                    chatHistory: historyForApiCall,
+                    language: userLanguage // Send detected language to backend
                 })
             });
 
@@ -249,7 +240,6 @@ const GeminiChatbot = () => {
 
             const data = await response.json();
             addMessageToDisplay(data.answer, 'bot');
-            // Save bot's response to history storage for the current/new interactionChatId
             if (saveToHistory) {
                 saveMessageToHistoryStorage(data.answer, 'bot', interactionChatId);
             }
@@ -260,7 +250,7 @@ const GeminiChatbot = () => {
             console.error('Error sending message:', error);
         }
     };
-    
+
     const handleUserInputKeyDown = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -271,12 +261,12 @@ const GeminiChatbot = () => {
     // --- CHAT MANAGEMENT (NEW, LOAD, DELETE, RENAME) ---
     const handleNewChat = () => {
         const newId = Date.now();
-        setCurrentChatId(newId); // Set new ID for the fresh chat session
-        setCurrentMessages([]);   // Clear messages on display
-        setShowWelcome(true);     // Show welcome message
-        if (userInputRef.current) userInputRef.current.value = ''; // Clear input field
-        setUserInput(''); // Clear state for input field
-        if (userInputRef.current) userInputRef.current.style.height = 'auto'; // Reset height
+        setCurrentChatId(newId);
+        setCurrentMessages([]);
+        setShowWelcome(true);
+        if (userInputRef.current) userInputRef.current.value = '';
+        setUserInput('');
+        if (userInputRef.current) userInputRef.current.style.height = 'auto';
         if (window.innerWidth < 768) setIsSidebarActive(false);
     };
 
@@ -284,9 +274,9 @@ const GeminiChatbot = () => {
         const chat = chatHistoryData.find(c => c.id === chatId);
         if (chat) {
             setCurrentChatId(chat.id);
-            setCurrentMessages(chat.messages || []); // Load messages, ensure it's an array
+            setCurrentMessages(chat.messages || []);
             setShowWelcome(false);
-             if (userInputRef.current) userInputRef.current.value = ''; // Clear input on load
+            if (userInputRef.current) userInputRef.current.value = '';
             setUserInput('');
             if (userInputRef.current) userInputRef.current.style.height = 'auto';
         }
@@ -294,41 +284,40 @@ const GeminiChatbot = () => {
     };
 
     const handleDeleteChat = (e, chatId) => {
-        e.stopPropagation(); // Prevent chat from loading when clicking delete
+        e.stopPropagation();
         setChatHistoryData(prev => prev.filter(c => c.id !== chatId));
-        if (currentChatId === chatId) { // If deleting the active chat
-            handleNewChat(); // Start a new chat session
+        if (currentChatId === chatId) {
+            handleNewChat();
         }
     };
 
     const handleStartRename = (e, chat) => {
         e.stopPropagation();
         setIsRenamingId(chat.id);
-        // Set initial renaming text to current title or first message snippet
         setRenamingText(chat.title || (chat.messages && chat.messages.length > 0 ? chat.messages[0].message.substring(0, 30) + (chat.messages[0].message.length > 30 ? '...' : '') : 'New chat'));
     };
-    
+
     const handleRenameConfirm = (chatIdToRename) => {
         const trimmedText = renamingText.trim();
-        if (!trimmedText) { // If user clears text, revert or set to default
+        if (!trimmedText) {
             const oldChat = chatHistoryData.find(c => c.id === chatIdToRename);
-            setRenamingText(oldChat?.title || (oldChat?.messages && oldChat.messages.length > 0 ? oldChat.messages[0].message.substring(0,30) : 'New Chat'));
-            setIsRenamingId(null); // Exit renaming mode
+            setRenamingText(oldChat?.title || (oldChat?.messages && oldChat.messages.length > 0 ? oldChat.messages[0].message.substring(0, 30) : 'New Chat'));
+            setIsRenamingId(null);
             return;
         }
         setChatHistoryData(prev => prev.map(c =>
             c.id === chatIdToRename ? { ...c, title: trimmedText } : c
         ));
         setIsRenamingId(null);
-        setRenamingText(''); // Clear renaming text state
+        setRenamingText('');
     };
 
     // --- AUTO-SCROLL & COPY ---
-    useEffect(() => { // Auto-scroll chatbox to bottom
+    useEffect(() => {
         if (chatboxRef.current) {
             chatboxRef.current.scrollTop = chatboxRef.current.scrollHeight;
         }
-    }, [currentMessages, isTyping]); // Trigger on new messages or typing indicator
+    }, [currentMessages, isTyping]);
 
     const handleCopy = (textToCopy, buttonElement) => {
         if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -342,13 +331,10 @@ const GeminiChatbot = () => {
                 }
             }).catch(err => console.error('Failed to copy text: ', err));
         } else {
-            // Fallback for older browsers or insecure contexts (http)
             console.warn('Clipboard API not available. Manual copy might be needed.');
-            // You could implement a textarea-based fallback here if essential
         }
     };
-    
-    // --- JSX Rendering ---
+
     return (
         <div className={`gemini-chatbot-page ${theme}-mode`}>
             <div className="app-container">
@@ -361,7 +347,7 @@ const GeminiChatbot = () => {
                     </div>
                     <div className="sidebar-content">
                         <button className="new-chat-btn" onClick={handleNewChat}>
-                            + New chat
+                            <i className="fas fa-plus"></i> New chat
                         </button>
                         <div className="save-toggle">
                             <span>Save to history</span>
@@ -377,7 +363,7 @@ const GeminiChatbot = () => {
                                 </div>
                             )}
                             {chatHistoryData.map(chat => (
-                                <div key={chat.id} className="chat-item" onClick={() => !isRenamingId && loadChat(chat.id)}>
+                                <div key={chat.id} className={`chat-item ${currentChatId === chat.id ? 'active-chat-item' : ''}`} onClick={() => !isRenamingId && loadChat(chat.id)}>
                                     {isRenamingId === chat.id ? (
                                         <input
                                             type="text"
@@ -386,11 +372,11 @@ const GeminiChatbot = () => {
                                             onChange={(e) => setRenamingText(e.target.value)}
                                             onBlur={() => handleRenameConfirm(chat.id)}
                                             onKeyDown={(e) => {
-                                                if(e.key === 'Enter') handleRenameConfirm(chat.id); 
-                                                if(e.key === 'Escape') {setIsRenamingId(null); setRenamingText('');} // Cancel on Escape
+                                                if (e.key === 'Enter') handleRenameConfirm(chat.id);
+                                                if (e.key === 'Escape') { setIsRenamingId(null); setRenamingText(''); }
                                             }}
                                             autoFocus
-                                            onClick={(e) => e.stopPropagation()} // Prevent chat load when clicking input
+                                            onClick={(e) => e.stopPropagation()}
                                         />
                                     ) : (
                                         <>
@@ -406,6 +392,19 @@ const GeminiChatbot = () => {
                                 </div>
                             ))}
                         </div>
+                        <div className="about-section">
+                            <div className="about-content">
+                                Prep-Portal Chatbot v1.0<br />
+                                A simple AI assistant interface
+                            </div>
+                            <div className="developer-info">
+                                <span>Developed by </span>
+                                <a href="https://www.linkedin.com/in/rinku-gupta-384b07283?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+                                    target="_blank" rel="noopener noreferrer" title="View developer's LinkedIn">
+                                    <i className="fab fa-linkedin linkedin-icon"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -413,62 +412,73 @@ const GeminiChatbot = () => {
                     <div id="chatbox" ref={chatboxRef}>
                         {showWelcome && (
                             <div className="welcome-message">
-                                <h2>Welcome to Gemini</h2>
-                                <p>Start a new chat or select from your history</p>
+                                <h2>Welcome to Prep-Portal!</h2>
+                                <p>Start a new chat or select from your history.</p>
                                 <p>Ask me anything!</p>
                             </div>
                         )}
                         {currentMessages.map((msg, index) => (
-                            // Use a more robust key, like timestamp + index if timestamps can be identical for rapid messages
                             <div key={`${msg.timestamp}-${index}`} className={`message-container ${msg.sender}-message-container`}>
                                 <div className={`avatar ${msg.sender}-avatar`}>
                                     {msg.sender === 'user' ? 'Y' : 'G'}
                                 </div>
                                 <div className={`message ${msg.sender}-message`}>
-                                {msg.sender === 'bot' ? (
-                                    <>
-                                        <div dangerouslySetInnerHTML={{ __html: formatBotContent(msg.message) }} />
-                                        <button className="copy-btn" onClick={(e) => handleCopy(msg.message, e.currentTarget)}>Copy</button>
-                                    </>
-                                ) : (
-                                    <div dangerouslySetInnerHTML={{ __html: processInlineFormatting(msg.message) }} />
-                                )}
+                                    {msg.sender === 'bot' ? (
+                                        <>
+                                            <div dangerouslySetInnerHTML={{ __html: formatBotContent(msg.message) }} />
+                                            <button className="copy-btn" onClick={(e) => handleCopy(msg.message, e.currentTarget)}>Copy</button>
+                                        </>
+                                    ) : (
+                                        <div dangerouslySetInnerHTML={{ __html: processInlineFormatting(msg.message) }} />
+                                    )}
                                 </div>
                             </div>
                         ))}
                         {isTyping && (
-                             <div className="message-container bot-message-container" id="typing-indicator">
+                            <div className="message-container bot-message-container">
                                 <div className="avatar bot-avatar">G</div>
-                                <div className="typing-indicator">
-                                    <div className="typing-dot"></div>
-                                    <div className="typing-dot"></div>
-                                    <div className="typing-dot"></div>
+                                <div className="message bot-message">
+                                    
+                                    <div className="typing-indicator">
+                                        <div className="typing-dot"></div>
+                                        <div className="typing-dot"></div>
+                                        <div className="typing-dot"></div>
+                                    </div>
                                 </div>
                             </div>
                         )}
                     </div>
-                    <div className="input-area">
-                        <textarea
-                            ref={userInputRef}
-                            id="userInput" // Keep ID if CSS targets it, or remove if not
-                            placeholder="Type your message..."
-                            autoComplete="off"
-                            rows="1"
-                            value={userInput}
-                            onChange={handleUserInputChange}
-                            onKeyDown={handleUserInputKeyDown}
-                            disabled={isTyping} // Disable input while bot is typing
-                        />
-                        <button 
-                            id="sendButton" // Keep ID if CSS targets it
-                            onClick={handleSendMessage} 
-                            disabled={isTyping || !userInput.trim()} // Disable if typing or input is empty
-                        >
-                            {isTyping ? 'Sending...' : 'Send'}
-                        </button>
+                    <div className="input-area-wrapper">
+                        <div className="input-area">
+                            <textarea
+                                ref={userInputRef}
+                                id="userInput"
+                                placeholder="Type your message..."
+                                autoComplete="off"
+                                rows="1"
+                                value={userInput}
+                                onChange={handleUserInputChange}
+                                onKeyDown={handleUserInputKeyDown}
+                                disabled={isTyping}
+                            />
+                            <button
+                                id="sendButton"
+                                onClick={handleSendMessage}
+                                disabled={isTyping || !userInput.trim()}
+                            >
+                                <i className="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div className="save-toggle">
+                            <span>Save to history</span>
+                            <label className="toggle-switch">
+                                <input type="checkbox" id="saveToggle" checked={saveToHistory} onChange={(e) => setSaveToHistory(e.target.checked)} />
+                                <span className="slider"></span>
+                            </label>
+                        </div>
                     </div>
                 </div>
-                <button ref={mobileMenuBtnRef} className="mobile-menu-btn" onClick={toggleMobileMenu}>☰</button>
+                <button ref={mobileMenuBtnRef} className="mobile-menu-btn" onClick={toggleMobileMenu}><i className="fas fa-bars"></i></button>
             </div>
         </div>
     );

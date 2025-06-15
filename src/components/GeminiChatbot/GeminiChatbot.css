@@ -1,17 +1,17 @@
-/* src/components/GeminiChatbot/GeminiChatbot.css */
+/* GeminiChatbot.css */
 :root {
-    --primary: #10a37f;
-    --primary-dark: #0d8a6a;
-    
+    --primary: #10a3a3;
+    --primary-dark: #0d848a;
+
     /* Light Mode Colors */
     --user-bubble-light: #e3e3e3;
-    --bot-bubble-light: #ffffff;
-    --text-light: #222222;
+    --bot-bubble-light: #46a3b1;
+    --text-light: #131313;
     --sidebar-light: #f5f5f5;
     --border-light: #d0d0d0;
     --background-light: #fafafa;
     --action-btn-light: #666666;
-    
+
     /* Dark Mode Colors */
     --user-bubble-dark: #343541;
     --bot-bubble-dark: #444654;
@@ -28,19 +28,16 @@
     padding: 0;
 }
 
-/* Styles for the top-level div of the React component */
 .gemini-chatbot-page {
     font-family: 'Segoe UI', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
-    margin: 0; /* Or adjust if part of a larger layout */
-    padding: 0; /* Or adjust if part of a larger layout */
+    margin: 0;
+    padding: 0;
     display: flex;
     flex-direction: column;
-    min-height: 100vh; /* Or 'height: 100vh;' if it's meant to be full screen always */
-    transition: background-color 0.3s ease, color 0.3s ease; /* Smoother theme transition */
+    min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
     line-height: 1.6;
-    overflow-x: hidden; /* Prevent horizontal scroll on the component itself */
-    background-color: var(--background);
-    color: var(--text);
+    overflow-x: hidden;
 }
 
 .gemini-chatbot-page.light-mode {
@@ -51,8 +48,8 @@
     --border: var(--border-light);
     --background: var(--background-light);
     --action-btn: var(--action-btn-light);
-    background-color: var(--background-light); /* Explicitly set for theme change */
-    color: var(--text-light); /* Explicitly set for theme change */
+    background-color: var(--background);
+    color: var(--text);
 }
 
 .gemini-chatbot-page.dark-mode {
@@ -63,33 +60,35 @@
     --border: var(--border-dark);
     --background: var(--background-dark);
     --action-btn: var(--action-btn-dark);
-    background-color: var(--background-dark); /* Explicitly set for theme change */
-    color: var(--text-dark); /* Explicitly set for theme change */
+    background-color: var(--background);
+    color: var(--text);
 }
 
-/* Mobile First Layout */
 .app-container {
     display: flex;
     flex-direction: column;
-    height: 100vh; /* Occupy full viewport height */
-    width: 100%;  /* Occupy full width of its parent (.gemini-chatbot-page) */
+    height: 100vh;
+    width: 100vw;
 }
 
 .sidebar {
     width: 100%;
     background-color: var(--sidebar);
     border-bottom: 1px solid var(--border);
-    transition: all 0.3s ease;
+    transition: max-height 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
     overflow: hidden;
     max-height: 0;
     opacity: 0;
     visibility: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .sidebar.active {
-    max-height: 50vh; /* Or adjust as needed for mobile sidebar height */
+    max-height: 70vh;
     opacity: 1;
     visibility: visible;
+    overflow-y: auto;
 }
 
 .sidebar-header {
@@ -98,8 +97,8 @@
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid var(--border);
-    background-color: var(--sidebar); /* Ensures header matches sidebar bg */
-    position: sticky; /* Keep header visible when sidebar content scrolls */
+    background-color: var(--sidebar);
+    position: sticky;
     top: 0;
     z-index: 10;
 }
@@ -107,54 +106,41 @@
 .sidebar-content {
     display: flex;
     flex-direction: column;
-    /* Calculate height based on parent and header. Adjust if needed. */
-    height: calc(100% - 48px); /* Assuming sidebar-header is 48px */
-    overflow-y: auto; /* Allow scrolling within sidebar content if it overflows */
+    flex-grow: 1;
 }
 
 .main {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    /* Calculate height to fill remaining space after mobile input area.
-       This might need adjustment based on actual input area height. */
-    height: calc(100% - 60px); /* Assuming input area + padding is roughly 60px */
-    position: relative; /* For positioning elements like typing indicator */
+    height: 100vh;
+    position: relative;
 }
 
-/* Tablet and Desktop Layout */
 @media (min-width: 768px) {
     .app-container {
         flex-direction: row;
     }
-    
     .sidebar {
         width: 280px;
-        max-height: none; /* Remove mobile height restriction */
+        max-height: 100vh;
         opacity: 1;
         visibility: visible;
         border-right: 1px solid var(--border);
-        border-bottom: none; /* Remove mobile bottom border */
+        border-bottom: none;
+        overflow-y: auto;
     }
-    
-    .sidebar-content {
-        height: calc(100vh - 48px); /* Full height minus header */
-    }
-    
     .main {
         width: calc(100% - 280px);
-        height: 100vh; /* Full viewport height */
     }
-    
     .mobile-menu-btn {
-        display: none; /* Hide mobile menu button on larger screens */
+        display: none;
     }
 }
 
-/* Mobile Menu Button */
 .mobile-menu-btn {
-    position: fixed; /* Fixed position relative to the viewport */
-    bottom: 70px; /* Adjust position as needed */
+    position: fixed;
+    bottom: 80px;
     right: 20px;
     background: var(--primary);
     color: white;
@@ -166,12 +152,11 @@
     align-items: center;
     justify-content: center;
     font-size: 1.2em;
-    z-index: 100; /* Ensure it's above other content */
+    z-index: 100;
     box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     cursor: pointer;
 }
 
-/* Theme Toggle */
 .theme-toggle {
     background: none;
     border: none;
@@ -181,12 +166,8 @@
     transition: transform 0.2s;
     padding: 8px;
 }
+.theme-toggle:hover { transform: scale(1.1); }
 
-.theme-toggle:hover {
-    transform: scale(1.1);
-}
-
-/* Chat History */
 .new-chat-btn {
     background: var(--primary);
     color: white;
@@ -203,17 +184,14 @@
     font-size: 0.95em;
     transition: background-color 0.2s;
 }
-
-.new-chat-btn:hover {
-    background: var(--primary-dark);
-}
+.new-chat-btn:hover { background: var(--primary-dark); }
+.new-chat-btn i { margin-right: 5px; }
 
 .chat-history {
-    flex-grow: 1; /* Take remaining space in sidebar-content */
-    overflow-y: auto; /* Scroll if history exceeds available space */
-    padding: 10px;
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 0 10px 10px 10px;
 }
-
 .chat-item {
     padding: 10px 12px;
     border-radius: 6px;
@@ -222,418 +200,234 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, color 0.2s;
     font-size: 0.95em;
+    color: var(--text);
+}
+.chat-item.active-chat-item {
+    background-color: var(--primary-dark);
+    color: white;
+}
+.chat-item.active-chat-item .chat-item-text {
+    color: white;
+}
+.chat-item.active-chat-item .chat-action-btn {
+    color: white;
+}
+.chat-item.active-chat-item .chat-action-btn:hover {
+    background-color: rgba(255,255,255,0.2);
 }
 
-.chat-item:hover {
-    background-color: rgba(0,0,0,0.08); /* Universal hover, adjust if needed per theme */
+.chat-item:hover:not(.active-chat-item) {
+     background-color: rgba(0,0,0,0.08);
 }
-.gemini-chatbot-page.light-mode .chat-item:hover {
-    background-color: rgba(0,0,0,0.05);
+.gemini-chatbot-page.dark-mode .chat-item:hover:not(.active-chat-item) {
+     background-color: rgba(255,255,255,0.08);
 }
-.gemini-chatbot-page.dark-mode .chat-item:hover {
-    background-color: rgba(255,255,255,0.08);
-}
-
 
 .chat-item-text {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     flex-grow: 1;
-    color: var(--text); /* Ensures text color adapts to theme */
 }
-
-.chat-item-actions {
-    display: flex;
-    gap: 6px;
-    opacity: 0;
-    transition: opacity 0.2s;
-}
-
-.chat-item:hover .chat-item-actions {
-    opacity: 1;
-}
-
+.chat-item-actions { display: flex; gap: 6px; opacity: 0; transition: opacity 0.2s; }
+.chat-item:hover .chat-item-actions { opacity: 1; }
 .chat-action-btn {
-    background: none;
-    border: none;
-    color: var(--action-btn);
-    cursor: pointer;
-    font-size: 0.9em;
-    padding: 4px;
-    border-radius: 4px;
-    transition: background-color 0.2s;
+    background: none; border: none; color: var(--action-btn); cursor: pointer;
+    font-size: 0.9em; padding: 4px; border-radius: 4px; transition: background-color 0.2s, color 0.2s;
 }
-
-.chat-action-btn:hover {
-    background-color: rgba(0,0,0,0.1); /* Universal hover */
-}
-.gemini-chatbot-page.light-mode .chat-action-btn:hover {
-    background-color: rgba(0,0,0,0.08);
-}
-.gemini-chatbot-page.dark-mode .chat-action-btn:hover {
-    background-color: rgba(255,255,255,0.1);
-}
+.chat-action-btn:hover { background-color: rgba(0,0,0,0.1); }
+.gemini-chatbot-page.dark-mode .chat-action-btn:hover { background-color: rgba(255,255,255,0.1); }
 
 .rename-input {
-    background: var(--bot-bubble); /* Consistent with input area style */
-    color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 6px 8px;
-    width: 100%;
-    font-size: 0.95em;
-    outline: none;
-}
-.rename-input:focus {
-    border-color: var(--primary);
+    background: var(--bot-bubble); color: var(--text); border: 1px solid var(--border);
+    border-radius: 4px; padding: 6px 8px; width: 100%; font-size: 0.95em;
 }
 
-/* Chat Area */
-#chatbox { /* ID can be kept if specifically targeted by JS not easily replaceable by ref */
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 15px;
-    background-color: var(--background); /* Ensures chatbox bg matches main page bg */
-    scroll-behavior: smooth;
+#chatbox {
+    flex-grow: 1; overflow-y: auto; padding: 15px;
+    background-color: var(--background); scroll-behavior: smooth;
+}
+.message-container { display: flex; margin-bottom: 15px; max-width: 95%; }
+.user-message-container { margin-left: auto; justify-content: flex-end; }
+.bot-message-container { justify-content: flex-start; }
+.message-container.bot-message-container {
+    align-items: center;
 }
 
-.message-container {
-    display: flex;
-    margin-bottom: 15px;
-    max-width: 100%; /* Ensure it doesn't overflow chatbox */
-}
-
-.avatar {
+.bot-avatar {
+    background-color: #6e6e80;
+    color: white;
     width: 36px;
     height: 36px;
     border-radius: 4px;
-    margin-right: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    color: white; /* Avatar text color */
-    flex-shrink: 0; /* Prevent avatar from shrinking */
-    font-size: 0.9em;
+    margin-right: 12px;
+    flex-shrink: 0;
 }
-
-.user-avatar {
-    background-color: var(--primary);
-}
-
-.bot-avatar {
-    background-color: #6e6e80; /* Or use a CSS variable if it needs to theme */
-}
-
-.message {
-    max-width: 85%; /* Max width of a message bubble */
-    padding: 12px 16px;
-    border-radius: 8px;
-    color: var(--text); /* Message text color */
-    position: relative; /* For positioning copy button */
-    font-size: clamp(0.9em, 3.5vw, 1em); /* Responsive font size */
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    word-wrap: break-word; /* Allow long words to break */
-    overflow-wrap: break-word; /* Ensure compatibility */
-}
-
-/* Enhanced Paragraph Formatting */
-.message p {
-    margin: 0.75em 0;
-    line-height: 1.6;
-}
-
-.message p:first-child {
-    margin-top: 0;
-}
-
-.message p:last-child {
-    margin-bottom: 0;
-}
-
-.message ul, .message ol {
-    margin: 0.75em 0;
-    padding-left: 1.5em; /* Indent lists */
-}
-
-.message li {
-    margin: 0.4em 0;
-}
-
-.message h1, .message h2, .message h3 {
-    margin: 0.8em 0 0.5em 0;
-    line-height: 1.3;
-}
-
-.message h1 { font-size: 1.3em; }
-.message h2 { font-size: 1.2em; }
-.message h3 { font-size: 1.1em; }
-
-.user-message {
-    background-color: var(--user-bubble);
-    margin-left: auto; /* Align user messages to the right */
-    border-bottom-right-radius: 0; /* "Tail" for user messages */
-}
-
 .bot-message {
     background-color: var(--bot-bubble);
-    border-bottom-left-radius: 0; /* "Tail" for bot messages */
+    color: var(--text);
+    padding: 12px 16px;
+    border-radius: 8px;
+    max-width: 85%;
+    position: relative;
+    font-size: clamp(0.9em, 3.5vw, 1em);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    word-wrap: break-word;
+    border-bottom-left-radius: 0;
+    display: flex;
+    align-items: center;
 }
+.avatar {
+    width: 36px; height: 36px; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; color: white; flex-shrink: 0; font-size: 0.9em;
+}
+.user-message-container .avatar { order: 2; margin-left: 12px; }
+.bot-message-container .avatar { order: 1; margin-right: 12px; }
+.user-avatar { background-color: var(--primary); }
+.bot-avatar { background-color: #6e6e80; }
 
-/* Rich Text Formatting */
-strong, b { font-weight: bold; }
-em, i { font-style: italic; }
-u { text-decoration: underline; }
+.message {
+    max-width: 85%; padding: 12px 16px; border-radius: 8px; color: var(--text);
+    position: relative; font-size: clamp(0.9em, 3.5vw, 1em);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05); word-wrap: break-word;
+}
+.user-message-container .message { order: 1; }
+.bot-message-container .message { order: 2; }
+
+.message p { margin: 0.5em 0; line-height: 1.6; }
+.message p:first-child { margin-top: 0; }
+.message p:last-child { margin-bottom: 0; }
+.message ul, .message ol { margin: 0.5em 0; padding-left: 1.7em; }
+.message li { margin: 0.3em 0; }
+.message h1, .message h2, .message h3 { margin: 0.6em 0 0.4em 0; line-height: 1.3; }
+.message h1 { font-size: 1.3em; } .message h2 { font-size: 1.2em; } .message h3 { font-size: 1.1em; }
+
+.user-message { background-color: var(--user-bubble); border-bottom-right-radius: 0; }
+.bot-message { background-color: var(--bot-bubble); border-bottom-left-radius: 0; }
+
+strong, b { font-weight: bold; } em, i { font-style: italic; } u { text-decoration: underline; }
 
 pre {
-    background-color: rgba(0,0,0,0.08); /* Universal pre background */
-    padding: 12px;
-    border-radius: 6px;
-    overflow-x: auto; /* Scroll for long code lines */
-    font-family: 'Courier New', monospace;
-    font-size: 0.9em;
-    line-height: 1.4;
-    margin: 0.75em 0;
-    white-space: pre-wrap; /* Wrap long lines within pre, but respect formatting */
-    word-break: break-all; /* Ensure very long unbroken strings wrap */
+    background-color: rgba(0,0,0,0.08); padding: 12px; border-radius: 6px;
+    overflow-x: auto; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+    font-size: 0.9em; line-height: 1.4; margin: 0.75em 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
-.gemini-chatbot-page.dark-mode pre {
-    background-color: rgba(255,255,255,0.08); /* Dark mode pre background */
-}
+.gemini-chatbot-page.dark-mode pre { background-color: rgba(255,255,255,0.05); }
+pre code { padding: 0; background-color: transparent; font-size: inherit;}
 
-
-code { /* Inline code */
-    font-family: 'Courier New', monospace;
-    background-color: rgba(0,0,0,0.08); /* Universal code background */
-    padding: 2px 4px;
-    border-radius: 3px;
-    font-size: 0.9em;
+code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; background-color: rgba(0,0,0,0.08);
+    padding: 2px 4px; border-radius: 3px; font-size: 0.9em;
 }
-.gemini-chatbot-page.dark-mode code {
-    background-color: rgba(255,255,255,0.08); /* Dark mode code background */
-}
-
-/* Code within pre should not have extra padding/bg from inline code style */
-pre > code {
-    background-color: transparent;
-    padding: 0;
-    border-radius: 0;
-    font-size: inherit; /* Inherit from pre */
-}
-
+.gemini-chatbot-page.dark-mode code { background-color: rgba(255,255,255,0.05); }
 
 blockquote {
-    border-left: 3px solid var(--primary);
-    padding-left: 12px;
-    margin: 0.75em 0;
-    color: var(--text); /* Use theme text color */
-    opacity: 0.9;
+    border-left: 3px solid var(--primary); padding-left: 12px;
+    margin: 0.75em 0; color: var(--text); opacity: 0.9;
 }
 
 .copy-btn {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background: rgba(0,0,0,0.1); /* Universal button bg */
-    border: none;
-    color: var(--text); /* Button text color */
-    border-radius: 4px;
-    padding: 4px 8px;
-    cursor: pointer;
-    opacity: 0;
-    transition: all 0.2s;
-    font-size: 0.8em;
+    position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.1);
+    border: none; color: var(--text); border-radius: 4px; padding: 4px 8px;
+    cursor: pointer; opacity: 0; transition: all 0.2s; font-size: 0.8em;
 }
-.gemini-chatbot-page.dark-mode .bot-message .copy-btn {
-    background: rgba(255,255,255,0.1);
-}
+.gemini-chatbot-page.dark-mode .copy-btn { background: rgba(255,255,255,0.1); color: var(--text-dark); }
+.bot-message:hover .copy-btn { opacity: 1; background: rgba(0,0,0,0.2); }
+.gemini-chatbot-page.dark-mode .bot-message:hover .copy-btn { background: rgba(255,255,255,0.2); }
+.copy-btn:hover { background: rgba(0,0,0,0.3) !important; }
+.gemini-chatbot-page.dark-mode .copy-btn:hover { background: rgba(255,255,255,0.3) !important; }
 
-
-.bot-message:hover .copy-btn {
-    opacity: 1;
-    background: rgba(0,0,0,0.2); /* Universal hover bg */
-}
-.gemini-chatbot-page.dark-mode .bot-message:hover .copy-btn {
-     background: rgba(255,255,255,0.2);
-}
-
-
-.copy-btn:hover {
-    background: rgba(0,0,0,0.3) !important; /* Stronger hover, ensure it overrides */
-}
-.gemini-chatbot-page.dark-mode .copy-btn:hover {
-    background: rgba(255,255,255,0.3) !important;
-}
-
-
-.typing-indicator { /* This is the container for dots, not the message bubble */
+.typing-indicator {
     display: flex;
-    /* padding: 10px 15px; Remove padding, avatar already has margin */
     align-items: center;
+    gap: 6px;
+    margin-left: 8px;
 }
-
 .typing-dot {
-    width: 8px;
-    height: 8px;
-    background-color: var(--text); /* Dot color */
-    border-radius: 50%;
-    margin: 0 3px;
-    animation: typing 1.4s infinite ease-in-out;
-    opacity: 0.6;
+    width: 8px; height: 8px; background-color: var(--text);
+    border-radius: 50%; margin: 0 3px;
+    animation: typing 1.4s infinite ease-in-out; opacity: 0.6;
 }
+@keyframes typing { 0%, 60%, 100% { transform: translateY(0); opacity: 0.6; } 30% { transform: translateY(-4px); opacity: 1; } }
 
-@keyframes typing {
-    0%, 60%, 100% { transform: translateY(0); opacity: 0.6; }
-    30% { transform: translateY(-4px); opacity: 1; }
+.input-area-wrapper {
+    background-color: var(--sidebar); border-top: 1px solid var(--border);
+    position: sticky; bottom: 0; z-index: 5;
 }
-
-/* Input Area */
-.input-area {
-    display: flex;
-    padding: 12px;
-    border-top: 1px solid var(--border);
-    background-color: var(--sidebar); /* Match sidebar bg for consistency */
-    position: sticky; /* Keep input area at the bottom */
-    bottom: 0;
-    z-index: 5;
+.input-area { display: flex; padding: 12px; align-items: flex-end; }
+#userInput {
+    flex-grow: 1; padding: 12px 15px; border: 1px solid var(--border);
+    border-radius: 24px; background-color: var(--bot-bubble); color: var(--text);
+    outline: none; font-size: clamp(0.9em, 4vw, 1em); transition: border-color 0.2s;
+    min-height: 48px; max-height: 120px; resize: none; line-height: 1.5;
 }
-
-#userInput { /* Can keep ID if specific JS targets it, or use a class */
-    flex-grow: 1;
-    padding: 12px 15px;
-    border: 1px solid var(--border);
-    border-radius: 24px; /* Rounded input field */
-    background-color: var(--bot-bubble); /* Input field background */
-    color: var(--text); /* Input text color */
-    outline: none;
-    font-size: clamp(0.9em, 4vw, 1em); /* Responsive font size */
-    transition: border-color 0.2s;
-    min-height: 48px; /* Minimum height */
-    max-height: 120px; /* Max height before scrolling */
-    resize: none; /* Disable manual resize */
-    line-height: 1.4; /* Adjust line height for better text fit */
-}
-
-#userInput:focus {
-    border-color: var(--primary);
-}
-
-#sendButton { /* Can keep ID or use class */
-    background-color: var(--primary);
-    color: white;
-    border: none;
-    padding: 0 20px; /* Padding for send button text */
-    border-radius: 24px; /* Match input field's border-radius */
-    cursor: pointer;
-    margin-left: 10px;
-    font-size: clamp(0.9em, 4vw, 1em); /* Responsive font size */
+#userInput:focus { border-color: var(--primary); }
+#sendButton {
+    background-color: var(--primary); color: white; border: none;
+    width: 48px; height: 48px;
+    border-radius: 24px; cursor: pointer; margin-left: 10px;
+    font-size: 1.2em;
     transition: background-color 0.2s;
-    min-width: 80px; /* Ensure button has a decent width */
-    display: flex; /* For centering icon if added later */
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
 }
+#sendButton:hover { background-color: var(--primary-dark); }
 
-#sendButton:hover {
-    background-color: var(--primary-dark);
-}
-
-/* Save to history toggle */
 .save-toggle {
-    display: flex;
-    align-items: center;
-    padding: 0 15px 10px; /* Padding around the toggle */
-    gap: 8px;
-    font-size: 0.9em;
-    color: var(--text); /* Text color for the label */
+    display: flex; align-items: center; padding: 0 15px 10px;
+    gap: 8px; font-size: 0.9em; color: var(--text); justify-content: flex-start;
 }
-
-.toggle-switch {
-    position: relative;
-    display: inline-block;
-    width: 40px;
-    height: 20px;
-}
-
-.toggle-switch input { /* Hide default checkbox */
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
+.toggle-switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
 .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc; /* Default slider background */
-    transition: .4s;
-    border-radius: 20px; /* Rounded slider */
+    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc; transition: .4s; border-radius: 20px;
 }
-
-.slider:before { /* The sliding knob */
-    position: absolute;
-    content: "";
-    height: 16px;
-    width: 16px;
-    left: 2px;
-    bottom: 2px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%; /* Circular knob */
+.slider:before {
+    position: absolute; content: ""; height: 16px; width: 16px;
+    left: 2px; bottom: 2px; background-color: white;
+    transition: .4s; border-radius: 50%;
 }
+input:checked + .slider { background-color: var(--primary); }
+input:checked + .slider:before { transform: translateX(20px); }
 
-input:checked + .slider {
-    background-color: var(--primary); /* Slider color when checked */
-}
-
-input:checked + .slider:before {
-    transform: translateX(20px); /* Move knob to the right when checked */
-}
-
-/* Welcome Message */
 .welcome-message {
-    text-align: center;
-    padding: 20px;
-    color: var(--text); /* Welcome message text color */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%; /* Fill available space in chatbox */
-    opacity: 0.8; /* Slightly subdued welcome message */
+    text-align: center; padding: 20px; color: var(--text);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; flex-grow: 1;
 }
+.welcome-message h2 { margin-bottom: 10px; font-size: 1.5em; }
+.welcome-message p { margin: 5px 0; opacity: 0.8; font-size: 1em; }
 
-.welcome-message h2 {
-    margin-bottom: 10px;
-    font-size: 1.5em;
+.about-section {
+    padding: 15px; border-top: 1px solid var(--border); color: var(--text);
+    font-size: 0.85em; opacity: 0.8; margin-top: auto;
 }
+.about-content { margin-bottom: 10px; line-height: 1.5; }
+.developer-info { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.developer-info a {
+    color: var(--text);
+    text-decoration: none;
+    display:inline-flex;
+    align-items:center;
+    gap: 5px;
+}
+.developer-info a:hover {
+    color: var(--primary);
+    text-decoration: underline;
+}
+.linkedin-icon { color: #0a66c2; font-size: 1.2em; transition: transform 0.2s; }
 
-.welcome-message p {
-    margin: 5px 0;
-    font-size: 1em;
-}
-
-/* Scrollbar styling */
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px; /* For horizontal scrollbars if any (like in <pre>) */
-}
-
-::-webkit-scrollbar-track {
-    background: transparent; /* Track is invisible */
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--border); /* Scrollbar thumb color */
-    border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--primary); /* Hover color for scrollbar thumb */
-}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }

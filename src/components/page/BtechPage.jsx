@@ -73,9 +73,9 @@ const BtechPageAlt = () => {
     { title: "B.TECH", link: "/btech/departments", external: false, page: "B_tech_dept.html" },
     { title: "BCA", link: "/bca/departments", external: false, page: "BCA_dept.html" },
     // { title: "Note", link: "https://drive.google.com/drive/folders/13km5M-5PY_waEYAbN_vDUNVtMa_wDh7r", external: false, page: "B_tech_dept.html" }, // Update link as needed
-    { title: "AI ChatBox", link: "https://geminichatbot-4wai.onrender.com", external: false }, // Update link as needed
+    // { title: "AI ChatBox", link: "https://geminichatbot-4wai.onrender.com", external: false }, // Update link as needed
     { title: "Note", link: "https://drive.google.com/drive/folders/13km5M-5PY_waEYAbN_vDUNVtMa_wDh7r", external: false, page: "B_tech_dept.html" }, // Update link as needed
-
+    { title: "AI ChatBox", link: "/btech/ai-chatbot", external: false },
     // { title: "AI ChatBox", link: "http://192.168.221.142:3000/", external: false }, // Update link as needed
     // { title: "Resume Analysis", link: "http://192.168.221.142:8080/", external: false, page: "B_tech_dept.html" }, // Update link as needed
 
