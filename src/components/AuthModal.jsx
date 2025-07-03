@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { API_BASE_URL } from '../utils';
+import { API_BASE_URL, handleError, handleSuccess } from '../utils';
+import ForgotPasswordModal from './ForgotPasswordModal';
 
 const AuthModal = ({ onClose, setIsAuthenticated }) => {
   const [activeTab, setActiveTab] = useState('login');
@@ -12,6 +12,7 @@ const AuthModal = ({ onClose, setIsAuthenticated }) => {
     password: ''
   });
   const [loading, setLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -50,10 +51,7 @@ const AuthModal = ({ onClose, setIsAuthenticated }) => {
       localStorage.setItem('user', JSON.stringify(data.data));
       setIsAuthenticated(true);
       
-      toast.success(`Successfully ${activeTab === 'login' ? 'logged in' : 'registered'}!`, {
-        position: "top-center",
-        autoClose: 2000,
-      });
+      handleSuccess(`Successfully ${activeTab === 'login' ? 'logged in' : 'registered'}!`);
 
       setTimeout(() => {
         onClose();
@@ -61,10 +59,7 @@ const AuthModal = ({ onClose, setIsAuthenticated }) => {
       }, 2000);
 
     } catch (error) {
-      toast.error(error.message, {
-        position: "top-center",
-        autoClose: 3000,
-      });
+      handleError(error.message || 'Authentication failed. Please try again.');
       console.error('Auth error:', error);
     } finally {
       setLoading(false);
@@ -174,10 +169,7 @@ const AuthModal = ({ onClose, setIsAuthenticated }) => {
               <div className="mt-4 text-center">
                 <button 
                   className="btn btn-link p-0"
-                  onClick={() => {
-                    onClose();
-                    toast.info('Forgot password functionality to be implemented');
-                  }}
+                  onClick={() => setShowForgotPassword(true)}
                 >
                   Forgot Password?
                 </button>
@@ -198,6 +190,12 @@ const AuthModal = ({ onClose, setIsAuthenticated }) => {
           </div>
         </div>
       </div>
+      
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal 
+        isOpen={showForgotPassword} 
+        onClose={() => setShowForgotPassword(false)} 
+      />
     </div>
   );
 };

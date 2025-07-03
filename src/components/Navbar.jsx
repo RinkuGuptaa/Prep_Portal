@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const Navbar = () => {
-  const navigate = useNavigate();
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
   const navbarRef = useRef(null);
 

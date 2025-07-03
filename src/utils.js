@@ -1,26 +1,29 @@
 import { toast } from 'react-toastify';
 
 export const handleError = (error) => {
-  toast.error(typeof error === 'string' ? error : 'An error occurred', {
-    position: "top-right",
-    autoClose: 5000,
+  const errorMessage = typeof error === 'string' ? error : error?.message || 'An unexpected error occurred';
+  toast.error(errorMessage, {
+    position: "top-center",
+    autoClose: 4000,
     hideProgressBar: false,
     closeOnClick: true,
     pauseOnHover: true,
     draggable: true,
     progress: undefined,
+    theme: "colored"
   });
 };
 
 export const handleSuccess = (message) => {
   toast.success(message, {
-    position: "top-right",
-    autoClose: 5000,
+    position: "top-center",
+    autoClose: 3000,
     hideProgressBar: false,
     closeOnClick: true,
     pauseOnHover: true,
     draggable: true,
     progress: undefined,
+    theme: "colored"
   });
 };
 

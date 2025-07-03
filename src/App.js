@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import Navbar from './components/Navbar'
 import Home from './components/Home'
 import Team from './components/Team'
@@ -9,7 +11,6 @@ import Contact from './components/Contact'
 import Enterprise from './components/Enterprise'
 import Footer from './components/Footer'
 import AuthModal from './components/AuthModal'
-// import ForgotPasswordModal from './components/ForgotPasswordModal'; // Uncomment if you want to use this
 import './styles.css'
 
 import BtechPage from './components/page/BtechPage'; // Ensure this path is correct
@@ -25,7 +26,7 @@ import Btech_ECE_Page from './components/page/Btech_ECE_Page';
 import GeminiChatbot from './components/GeminiChatbot/GeminiChatbot';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [, setIsAuthenticated] = useState(false)
 
   // Custom wrapper to use useLocation outside Router
   const NavbarWrapper = () => {
@@ -77,6 +78,17 @@ function App() {
             document.body.classList.remove('modal-open');
           }
         }}
+      />
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
       />
     </Router>
   )

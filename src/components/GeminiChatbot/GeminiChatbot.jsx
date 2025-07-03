@@ -1,5 +1,6 @@
 // pre-portal/src/components/GeminiChatbot/GeminiChatbot.jsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { handleError } from '../../utils';
 import './GeminiChatbot.css'; // Import the CSS
 
 const GeminiChatbot = () => {
@@ -17,6 +18,7 @@ const GeminiChatbot = () => {
     const [renamingText, setRenamingText] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const [showWelcome, setShowWelcome] = useState(true);
+    const [requestCooldown, setRequestCooldown] = useState(false);
 
     const chatboxRef = useRef(null);
     const userInputRef = useRef(null);
@@ -130,12 +132,12 @@ const GeminiChatbot = () => {
                     const quoteText = processedPara.substring(2);
                     return `<blockquote>${processInlineFormatting(quoteText)}</blockquote>`;
                 }
-                if (processedPara.match(/^[\s]*[\-\*\+]\s/) || processedPara.match(/^[\s]*\d+\.\s/)) {
+                if (processedPara.match(/^[\s]*[-*+]\s/) || processedPara.match(/^[\s]*\d+\.\s/)) {
                     const listItems = processedPara.split('\n').filter(item => item.trim());
                     const isOrdered = processedPara.match(/^[\s]*\d+\.\s/);
                     const listTag = isOrdered ? 'ol' : 'ul';
                     const listContent = listItems.map(item => {
-                        const cleanedItem = item.replace(/^[\s]*[\-\*\+]\s|^[\s]*\d+\.\s/, '');
+                        const cleanedItem = item.replace(/^[\s]*[-*+]\s|^[\s]*\d+\.\s/, '');
                         return `<li>${processInlineFormatting(cleanedItem)}</li>`;
                     }).join('');
                     return `<${listTag}>${listContent}</${listTag}>`;
@@ -188,7 +190,11 @@ const GeminiChatbot = () => {
 
     const handleSendMessage = async () => {
         const messageText = userInput.trim();
-        if (!messageText || isTyping) return;
+        if (!messageText || isTyping || requestCooldown) return;
+        
+        // Add cooldown to prevent API overload
+        setRequestCooldown(true);
+        setTimeout(() => setRequestCooldown(false), 2000); // 2 second cooldown
 
         // Detect language from input
         const userLanguage = detectInputLanguage(messageText);
@@ -246,7 +252,9 @@ const GeminiChatbot = () => {
 
         } catch (error) {
             setIsTyping(false);
-            addMessageToDisplay(`Sorry, an error occurred: ${error.message}`, 'bot');
+            const errorMessage = `Sorry, an error occurred: ${error.message}`;
+            addMessageToDisplay(errorMessage, 'bot');
+            handleError(error.message || 'Failed to get response from AI assistant');
             console.error('Error sending message:', error);
         }
     };
@@ -464,9 +472,14 @@ const GeminiChatbot = () => {
                             <button
                                 id="sendButton"
                                 onClick={handleSendMessage}
-                                disabled={isTyping || !userInput.trim()}
+                                disabled={isTyping || !userInput.trim() || requestCooldown}
+                                title={requestCooldown ? "Please wait before sending another message" : "Send message"}
                             >
-                                <i className="fas fa-paper-plane"></i>
+                                {requestCooldown ? (
+                                    <i className="fas fa-clock"></i>
+                                ) : (
+                                    <i className="fas fa-paper-plane"></i>
+                                )}
                             </button>
                         </div>
                         <div className="save-toggle">

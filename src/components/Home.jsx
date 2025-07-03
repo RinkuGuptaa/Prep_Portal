@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import Typed from 'typed.js';
@@ -16,9 +16,13 @@ const Home = () => {
   const typedElementRef = useRef(null);
   const typedInstanceRef = useRef(null);
   const animationFrameRef = useRef(null);
+  
+  // State for preventing overload
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [scrollDisabled, setScrollDisabled] = useState(false);
 
-  // Book images array
-  const bookImages = [
+  // Book images array - wrapped in useMemo to prevent re-creation on every render
+  const bookImages = useMemo(() => [
     "https://www.scijournal.org/articles/wp-content/uploads/2022/04/SCI062-Best-Books-for-Engineering-Students.jpg",
     "https://imgix.bustle.com/fatherly/2015/07/980x-41.jpg?w=414&h=345&fit=crop&crop=faces&dpr=2",
     "https://revolutionized.com/wp-content/uploads/sites/5/2022/04/10-books-for-engineers.jpg",
@@ -34,9 +38,21 @@ const Home = () => {
     "https://media.gettyimages.com/id/1458805217/photo/a-book-left-open-in-the-classroom.jpg?s=612x612&w=0&k=20&c=e2Mp21cpaJGx-k2TBosAwMf22rg5uSZuGGp-4sRRA5M=",
     "https://media.gcflearnfree.org/content/55e0730c7dd48174331f5164_01_17_2014/whatisacomputer_laptop_computers.jpg",
     "https://burst.shopifycdn.com/photos/laptop-from-above.jpg?width=1000&format=pjpg&exif=0&iptc=0"
-  ];
+  ], []);
 
-  const handleExploreClick = () => {
+  // Debounced explore click function to prevent overload
+  const handleExploreClick = useCallback(() => {
+    // Prevent multiple rapid clicks
+    if (isNavigating || scrollDisabled) {
+      return;
+    }
+
+    setIsNavigating(true);
+    setScrollDisabled(true);
+
+    // Temporarily disable scroll to prevent overload
+    document.body.style.overflow = 'hidden';
+
     const user = localStorage.getItem('user');
     if (!user) {
       toast.error('Please log in to access resources', {
@@ -48,10 +64,21 @@ const Home = () => {
       if (modal) {
         window.$('#authModal').modal('show');
       }
+      
+      // Re-enable after a short delay
+      setTimeout(() => {
+        setIsNavigating(false);
+        setScrollDisabled(false);
+        document.body.style.overflow = 'auto';
+      }, 1000);
     } else {
-      navigate('/btech');
+      // Add a small delay to show loading state
+      setTimeout(() => {
+        navigate('/btech');
+        // Navigation will handle re-enabling
+      }, 300);
     }
-  };
+  }, [isNavigating, scrollDisabled, navigate]);
 
   useEffect(() => {
     if (inView && typedElementRef.current) {
@@ -70,8 +97,6 @@ const Home = () => {
       // Book and particle animation
       const container = document.querySelector('.home-container');
       const border = 100;
-      const books = [];
-      const particles = [];
 
       const createBookElement = (imageSrc) => {
         const bookElement = document.createElement('div');
@@ -92,6 +117,7 @@ const Home = () => {
           case 1: startX = Math.random() * container.clientWidth; startY = -border; break;
           case 2: startX = container.clientWidth + border; startY = Math.random() * container.clientHeight; break;
           case 3: startX = Math.random() * container.clientWidth; startY = container.clientHeight + border; break;
+          default: startX = -border; startY = Math.random() * container.clientHeight; break;
         }
 
         bookElement.style.left = `${startX}px`;
@@ -123,6 +149,7 @@ const Home = () => {
           case 1: startX = Math.random() * container.clientWidth; startY = -border; break;
           case 2: startX = container.clientWidth + border; startY = Math.random() * container.clientHeight; break;
           case 3: startX = Math.random() * container.clientWidth; startY = container.clientHeight + border; break;
+          default: startX = -border; startY = Math.random() * container.clientHeight; break;
         }
 
         particle.style.left = `${startX}px`;
@@ -167,8 +194,10 @@ const Home = () => {
       if (animationFrameRef.current) {
         clearTimeout(animationFrameRef.current);
       }
+      // Ensure scroll is always re-enabled on cleanup
+      document.body.style.overflow = 'auto';
     };
-  }, [inView]);
+  }, [inView, bookImages]);
 
   return (
     <div id="home" className="home-container" ref={containerRef}>
@@ -198,13 +227,23 @@ const Home = () => {
             transition={{ delay: 0.6, duration: 0.5 }}
           >
             <button 
-              className="cta-button"
+              className={`cta-button ${isNavigating || scrollDisabled ? 'disabled' : ''}`}
               onClick={handleExploreClick}
+              disabled={isNavigating || scrollDisabled}
             >
-              Explore Resources
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14M12 5l7 7-7 7"></path>
-              </svg>
+              {isNavigating || scrollDisabled ? (
+                <>
+                  <span className="loading-spinner"></span>
+                  {isNavigating ? 'Loading...' : 'Please wait...'}
+                </>
+              ) : (
+                <>
+                  Explore Resources
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14M12 5l7 7-7 7"></path>
+                  </svg>
+                </>
+              )}
             </button>
           </motion.div>
         </motion.div>
